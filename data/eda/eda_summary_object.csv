@@ -1,0 +1,5 @@
+,BoardId,TradeDate,ShortName,SecId,CurrencyId,TradeSessionDate,DayOfWeek,SecurityType,PriceCategory,VolumeCategory,VolatilityCategory
+count,20780,20780,20780,20780,20780,5157,20780,20780,20780,20780,20780
+unique,1,764,30,30,1,172,6,2,6,4,3
+top,TQBR,2025-10-23,Сбербанк,SBER,SUR,2025-03-03,Friday,Обыкновенная,Высокая,Очень высокий,Низкая
+freq,20780,30,764,764,20780,30,4163,18492,6702,5195,6936

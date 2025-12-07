@@ -48,7 +48,7 @@ def moex_get_securities(host='https://iss.moex.com'):
         print("❌ Ошибка при запросе:", e)
 
 
-def moex_save_securities(data, path='data/data_moex_securities.csv'):
+def moex_save_securities(data, path='data/moex/moex_securities.csv'):
     try:
         print("🔎 Проверяю и сохраняю данные...")
         if 'securities' in data and data['securities']['data']:

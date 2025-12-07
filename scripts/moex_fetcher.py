@@ -31,7 +31,7 @@ import time
 from dateutil import parser
 
 
-def moex_read_securities(path='data/data_moex_securities.csv'):
+def moex_read_securities(path='data/moex/moex_securities.csv'):
     try:
         return pd.read_csv(path, encoding="utf-8-sig")
     except FileNotFoundError:
