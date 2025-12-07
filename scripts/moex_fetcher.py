@@ -108,8 +108,7 @@ def moex_save_data_all(secid, df, path='data/moex/moex_secid.csv'):
     if not df.empty:
         path = path.replace("secid", secid)
         df = df.drop_duplicates().sort_values("TRADEDATE")
-        df.index = df.index + 1
-        df.to_csv(path, index=True, encoding="utf-8-sig")
+        df.to_csv(path, index=False, encoding="utf-8-sig")
         print(f"✅ Данные сохранены в {path}")
         return df
     else:
