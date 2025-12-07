@@ -104,7 +104,7 @@ def moex_get_data_all(secid, date_start, date_end, board='TQBR', host='https://i
         return pd.DataFrame()
 
 
-def moex_save_data_all(secid, df, path='models/model_moex_secid.csv'):
+def moex_save_data_all(secid, df, path='data/moex/moex_secid.csv'):
     if not df.empty:
         path = path.replace("secid", secid)
         df = df.drop_duplicates().sort_values("TRADEDATE")
