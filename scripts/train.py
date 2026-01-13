@@ -1,11 +1,12 @@
 import os
 import argparse
+import glob
 import numpy as np
 import pandas as pd
 
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
-# python scripts/train.py --data-dir data/moex --secid SBER --out artifacts/sarimax_sber.pkl
+# python scripts/train.py --data-dir data/moex --all --out-dir artifacts
 
 # Тикеты
 SECIDS = ['GAZP', 'GMKN', 'LKOH', 'NVTK', 'PIKK', 'ROSN', 'SBER', 'T', 'VTBR', 'YDEX']
@@ -104,8 +105,7 @@ def build_series(df: pd.DataFrame, secid: str) -> pd.DataFrame:
     # ensure types
     df_series["TRADEDATE"] = pd.to_datetime(df_series["TRADEDATE"])
     df_series = df_series.sort_values("TRADEDATE").reset_index(drop=True)
-
-    # LOG_RETURN — исправлено: считаем на df_series (в ноутбуке была ошибка)
+    
     df_series["LOG_RETURN"] = np.log(
         df_series["LEGALCLOSEPRICE"] / df_series["LEGALCLOSEPRICE"].shift(1)
     )
@@ -127,29 +127,55 @@ def train_sarimax(log_returns: pd.Series, order=(1, 0, 1)):
     return model_fit
 
 
+def detect_secids(data_dir: str) -> list[str]:
+    files = glob.glob(os.path.join(data_dir, "moex_*.csv"))
+    secids = []
+    for f in files:
+        name = os.path.basename(f)
+        secid = name.replace("moex_", "").replace(".csv", "")
+        secids.append(secid)
+    return sorted(secids)
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", type=str, default="data/moex", help="Папка с CSV: moex_<SECID>.csv")
-    parser.add_argument("--secid", type=str, default="SBER", help="Тикер, например SBER")
-    parser.add_argument("--out", type=str, default="artifacts/sarimax_sber.pkl", help="Куда сохранить модель")
-    parser.add_argument("--order", type=str, default="1,0,1", help="ARIMA order p,d,q например 1,0,1")
-    parser.add_argument("--save-merged", type=str, default="", help="(опц.) сохранить объединённый CSV")
+    parser.add_argument("--data-dir", type=str, default="data/moex")
+    parser.add_argument("--secid", type=str, default="SBER")
+    parser.add_argument("--all", action="store_true", help="обучить модели для всех тикеров из папки")
+    parser.add_argument("--out", type=str, default="", help="файл для одной модели, напр artifacts/sarimax_SBER.pkl")
+    parser.add_argument("--out-dir", type=str, default="artifacts", help="папка для сохранения моделей в режиме --all")
+    parser.add_argument("--order", type=str, default="1,0,1")
     args = parser.parse_args()
 
     p, d, q = (int(x.strip()) for x in args.order.split(","))
 
-    merged_out = args.save_merged.strip() or None
-    df = merge_csv_files(args.data_dir, output_file=merged_out)
+    df = merge_csv_files(args.data_dir, output_file=None)
+
+    if args.all:
+        os.makedirs(args.out_dir, exist_ok=True)
+        secids = detect_secids(args.data_dir)
+        print(f"Найдено тикеров: {len(secids)} -> {secids}")
+
+        for secid in secids:
+            try:
+                df_series = build_series(df, secid)
+                model_fit = train_sarimax(df_series["LOG_RETURN"], order=(p, d, q))
+
+                out_path = os.path.join(args.out_dir, f"sarimax_{secid}.pkl")
+                model_fit.save(out_path)
+                print(f"Saved: {out_path}")
+            except Exception as e:
+                print(f"Skip {secid}: {e}")
+        return
+
+    # одиночный режим
+    out_path = args.out or os.path.join("artifacts", f"sarimax_{args.secid}.pkl")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
 
     df_series = build_series(df, args.secid)
-    print(f"Ряд для {args.secid}: {df_series.shape}, период {df_series['TRADEDATE'].min()} — {df_series['TRADEDATE'].max()}")
-
     model_fit = train_sarimax(df_series["LOG_RETURN"], order=(p, d, q))
+    model_fit.save(out_path)
 
-    os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    model_fit.save(args.out)
-    print(f"✅ Модель сохранена: {args.out}")
-
+    print(f"Модель сохранена: {out_path}")
 
 if __name__ == "__main__":
     main()

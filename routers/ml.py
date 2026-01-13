@@ -1,57 +1,3 @@
-# import time
-# from fastapi import APIRouter, Depends, HTTPException, Request
-# from pydantic import ValidationError
-
-# from domain.schemas import ForwardRequest, ForwardResponse
-# from services.ml_service import MLService
-
-# router = APIRouter(tags=["ML"])
-
-
-# def get_ml_service() -> MLService:
-#     return MLService("artifacts/sarimax_sber.pkl")
-
-
-# @router.post("/forward", response_model=ForwardResponse)
-# async def forward(
-#     request: Request,
-#     ml: MLService = Depends(get_ml_service),
-# ):
-#     # 1) Неверный формат -> 400 bad request
-#     ct = request.headers.get("content-type", "")
-#     if not ct.startswith("application/json"):
-#         raise HTTPException(status_code=400, detail="bad request")
-
-#     # 2) Пытаемся прочитать JSON (если не парсится -> 400)
-#     try:
-#         payload = await request.json()
-#     except Exception:
-#         raise HTTPException(status_code=400, detail="bad request")
-
-#     # 3) Валидируем payload через Pydantic вручную (если не валиден -> 400 по ТЗ)
-#     try:
-#         dto = ForwardRequest.model_validate(payload)  # pydantic v2
-#         # если у тебя pydantic v1, будет: dto = ForwardRequest.parse_obj(payload)
-#     except ValidationError:
-#         raise HTTPException(status_code=400, detail="bad request")
-
-#     start = time.perf_counter()
-#     try:
-#         forecast = await ml.forecast(dto.secid, dto.horizon)
-#     except Exception:
-#         # по ТЗ: модель не смогла -> 403
-#         raise HTTPException(status_code=403, detail="модель не смогла обработать данные")
-#     finally:
-#         _processing_ms = (time.perf_counter() - start) * 1000.0
-#         # позже: логирование в БД
-
-#     return ForwardResponse(
-#         secid=dto.secid,
-#         horizon=dto.horizon,
-#         target="LOG_RETURN",
-#         forecast=forecast,
-#         model="SARIMAX(1,0,1)",
-#     )
 import time
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -74,6 +20,7 @@ router = APIRouter(tags=["ML"])
 @router.post("/forward", response_model=ForwardResponse)
 async def forward(
     request: Request,
+    dto: ForwardRequest,
     session: AsyncSession = Depends(get_session),
 ):
     if not request.headers.get("content-type", "").startswith("application/json"):
@@ -85,7 +32,7 @@ async def forward(
     except Exception:
         raise HTTPException(status_code=400, detail="bad request")
 
-    service = MLService("artifacts/sarimax_sber.pkl")
+    service = MLService("artifacts")
     repo = MLRequestRepository(session)
 
     start = time.perf_counter()

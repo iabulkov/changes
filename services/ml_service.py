@@ -1,64 +1,28 @@
-# import os
-# import asyncio
-# from statsmodels.tsa.statespace.sarimax import SARIMAXResults
-
-
-# class MLService:
-#     def __init__(self, model_path: str = "artifacts/sarimax_sber.pkl"):
-#         self.model_path = model_path
-#         self._model = None
-
-#     async def load(self) -> None:
-#         if self._model is not None:
-#             return
-
-#         def _load_sync():
-#             if not os.path.exists(self.model_path):
-#                 raise FileNotFoundError(self.model_path)
-#             return SARIMAXResults.load(self.model_path)
-
-#         self._model = await asyncio.to_thread(_load_sync)
-
-#     async def forecast(self, secid: str, horizon: int) -> list[float]:
-#         # Модель обучена под SBER на данный момент
-#         if secid != "SBER":
-#             raise ValueError("unsupported secid")
-
-#         await self.load()
-
-#         def _predict_sync():
-#             pred = self._model.get_forecast(steps=horizon).predicted_mean
-#             return [float(x) for x in pred]
-
-#         return await asyncio.to_thread(_predict_sync)
+import os
 import asyncio
 from statsmodels.tsa.statespace.sarimax import SARIMAXResults
 
-
 class MLService:
-    def __init__(self, model_path: str):
-        self.model_path = model_path
-        self._model = None
+    def __init__(self, artifacts_dir: str = "artifacts"):
+        self.artifacts_dir = artifacts_dir
+        self._cache = {}  # secid -> model
 
-    async def _load_model(self):
-        if self._model is None:
-            self._model = await asyncio.to_thread(
-                SARIMAXResults.load, self.model_path
-            )
+    async def _load(self, secid: str):
+        if secid in self._cache:
+            return self._cache[secid]
+
+        path = os.path.join(self.artifacts_dir, f"sarimax_{secid}.pkl")
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"model not found for {secid}")
+
+        model = await asyncio.to_thread(SARIMAXResults.load, path)
+        self._cache[secid] = model
+        return model
 
     async def predict(self, secid: str, horizon: int) -> list[float]:
-        if secid != "SBER":
-            raise ValueError("unsupported secid")
-
-        await self._load_model()
+        model = await self._load(secid)
 
         def _predict():
-            return (
-                self._model
-                .get_forecast(steps=horizon)
-                .predicted_mean
-                .astype(float)
-                .tolist()
-            )
+            return model.get_forecast(steps=horizon).predicted_mean.astype(float).tolist()
 
         return await asyncio.to_thread(_predict)

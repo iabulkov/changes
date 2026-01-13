@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
 import uvicorn
 from routers.ml import router as ml_router
 from database import init_db
 from routers import ml
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+
 
 
 @asynccontextmanager
@@ -48,6 +51,11 @@ async def health():
         "database": "connected / подключена",
         "architecture": "DDD with async SQLAlchemy 2.0"
     }
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(status_code=400, content={"detail": "bad request"})
+
 
 if __name__ == "__main__":
     """

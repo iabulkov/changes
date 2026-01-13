@@ -17,7 +17,7 @@ artifacts/sarimax_sber.pkl
 Если модели ещё нет — обучить и сохранить (скрипт из проекта):
 
 ```bash
-python scripts/train.py --data-dir data/moex --secid SBER --out artifacts/sarimax_sber.pkl
+python scripts/train.py --data-dir data/moex --all --out-dir artifacts
 ```
 
 ### 3) Запуск FastAPI сервиса
