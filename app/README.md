@@ -8,13 +8,13 @@ pip install -r requirements.txt
 
 ### 2) Проверка наличия модели
 
-В проекте должен быть файл:
+В проекте должны быть обученные модели вида:
 
 ```
-artifacts/sarimax_sber.pkl
+artifacts/sarimax_SECID.pkl
 ```
 
-Если модели ещё нет — обучить и сохранить (скрипт из проекта):
+Если моделей нет — обучить и сохранить (скрипт из проекта):
 
 ```bash
 python scripts/train.py --data-dir data/moex --all --out-dir artifacts
@@ -23,7 +23,7 @@ python scripts/train.py --data-dir data/moex --all --out-dir artifacts
 ### 3) Запуск FastAPI сервиса
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.api:app --reload
 ```
 
 После запуска Swagger будет доступен:
@@ -34,7 +34,8 @@ uvicorn main:app --reload
 
 ## Что делает сервис
 
-Модель `sarimax_sber.pkl` — это обученный SARIMAX для тикера **SBER**, обученный на целевой переменной **LOG_RETURN** (лог-доходность).
+Например, модель `sarimax_SBER.pkl` — это модель SARIMAX для тикера **SBER**, обученная на целевой переменной **LOG_RETURN** (лог-доходность).
+
 Эндпоинт `/forward` выполняет **inference**: возвращает прогноз `LOG_RETURN` на `horizon` шагов вперёд.
 
 ---

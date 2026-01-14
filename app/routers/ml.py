@@ -2,16 +2,16 @@ import time
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import get_session
-from domain.schemas import ForwardRequest, ForwardResponse
-from factories.ml_factory import MLRequestFactory
-from repositories.ml_repository import MLRequestRepository
-from services.ml_service import MLService
-from domain.schemas import HistoryItem
-from services.history_service import HistoryService
+from app.db.database import get_session
+from app.domain.schemas import ForwardRequest, ForwardResponse
+from app.factories.ml_factory import MLRequestFactory
+from app.repositories.ml_repository import MLRequestRepository
+from app.services.ml_service import MLService
+from app.domain.schemas import HistoryItem
+from app.services.history_service import HistoryService
 from fastapi import Query
-from domain.schemas import StatsResponse
-from services.stats_service import StatsService
+from app.domain.schemas import StatsResponse
+from app.services.stats_service import StatsService
 
 
 router = APIRouter(tags=["ML"])

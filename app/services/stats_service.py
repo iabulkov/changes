@@ -1,4 +1,4 @@
-from repositories.ml_repository import MLRequestRepository
+from app.repositories.ml_repository import MLRequestRepository
 
 def _quantile(sorted_vals: list[float], p: float) -> float | None:
     if not sorted_vals:

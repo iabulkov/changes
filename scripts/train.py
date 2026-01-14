@@ -53,6 +53,7 @@ def merge_csv_files(data_dir: str, output_file: str | None = None) -> pd.DataFra
         print(f"Объединённый датасет сохранён в: {output_file}")
     
     print("=" * 50)
+
     return result_df
 
 
@@ -90,6 +91,7 @@ def fill_missing_dates(df, column="TRADEDATE") -> pd.DataFrame:
     df_filled = df_filled.sort_values(by=column).reset_index(drop=True)
 
     return df_filled
+
 
 def build_series(df: pd.DataFrame, secid: str) -> pd.DataFrame:
     """
@@ -136,6 +138,7 @@ def detect_secids(data_dir: str) -> list[str]:
         secids.append(secid)
     return sorted(secids)
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=str, default="data/moex")
@@ -176,6 +179,7 @@ def main():
     model_fit.save(out_path)
 
     print(f"Модель сохранена: {out_path}")
+
 
 if __name__ == "__main__":
     main()

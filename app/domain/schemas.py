@@ -1,8 +1,10 @@
 from pydantic import BaseModel, Field
 
+
 class ForwardRequest(BaseModel):
     secid: str = Field(default="SBER", description="Тикер")
     horizon: int = Field(ge=1, le=365, description="Горизонт прогноза в шагах")
+
 
 class ForwardResponse(BaseModel):
     secid: str
@@ -10,6 +12,7 @@ class ForwardResponse(BaseModel):
     target: str
     forecast: list[float]
     model: str
+
 
 class HistoryItem(BaseModel):
     id: int
@@ -20,6 +23,7 @@ class HistoryItem(BaseModel):
     processing_ms: float
     status_code: int
     error: str | None
+
 
 class StatsResponse(BaseModel):
     count: int

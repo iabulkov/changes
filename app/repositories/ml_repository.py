@@ -20,7 +20,8 @@
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from domain.models import MLRequest
+from app.domain.ml_models import MLRequest
+
 
 class MLRequestRepository:
     def __init__(self, session: AsyncSession):
@@ -35,7 +36,7 @@ class MLRequestRepository:
             select(MLRequest).order_by(MLRequest.created_at.desc()).limit(limit)
         )
         return res.scalars().all()
-    
+
     async def get_stats_rows(self) -> list[tuple[float, int, int]]:
         """
         Returns list of tuples: (processing_ms, payload_len, horizon)

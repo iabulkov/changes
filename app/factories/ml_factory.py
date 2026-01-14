@@ -1,5 +1,5 @@
-from domain.models import MLRequest
-from domain.schemas import ForwardRequest
+from app.domain.ml_models import MLRequest
+from app.domain.schemas import ForwardRequest
 
 
 class MLRequestFactory:

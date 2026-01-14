@@ -1,12 +1,10 @@
 from contextlib import asynccontextmanager
 import uvicorn
-from routers.ml import router as ml_router
-from database import init_db
-from routers import ml
+from app.db.database import init_db
+from app.routers import ml
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-
 
 
 @asynccontextmanager
@@ -75,12 +73,12 @@ if __name__ == "__main__":
     ║        API управления пользователями с DDD                   ║
     ║                                                              ║
     ║  Architecture / Архитектура:                                 ║
-    ║  ├─ API Layer (Routers) / Слой API                          ║
-    ║  ├─ Service Layer / Слой сервисов                           ║
-    ║  ├─ Unit of Work / Unit of Work                             ║
-    ║  ├─ Repository Layer / Слой репозиториев                    ║
-    ║  ├─ Domain Layer / Доменный слой                            ║
-    ║  └─ Database / База данных                                  ║
+    ║  ├─ API Layer (Routers) / Слой API                           ║
+    ║  ├─ Service Layer / Слой сервисов                            ║
+    ║  ├─ Unit of Work / Unit of Work                              ║
+    ║  ├─ Repository Layer / Слой репозиториев                     ║
+    ║  ├─ Domain Layer / Доменный слой                             ║
+    ║  └─ Database / База данных                                   ║
     ║                                                              ║
     ║  Docs: http://localhost:8000/docs                            ║
     ║  ReDoc: http://localhost:8000/redoc                          ║

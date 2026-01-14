@@ -1,5 +1,5 @@
-from domain.schemas import HistoryItem
-from repositories.ml_repository import MLRequestRepository
+from app.domain.schemas import HistoryItem
+from app.repositories.ml_repository import MLRequestRepository
 
 class HistoryService:
     def __init__(self, repo: MLRequestRepository):

@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, Float, DateTime, func
 
-from database import Base
+from app.db.models import Base
 
 
 class MLRequest(Base):
