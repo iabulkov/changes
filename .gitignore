@@ -210,4 +210,4 @@ __marimo__/
 
 # Project files
 artifacts/sarimax_*.pkl
-app/db/ml.db
+legacy_app/db/ml.db
