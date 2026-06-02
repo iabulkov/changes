@@ -211,3 +211,10 @@ __marimo__/
 # Project files
 artifacts/sarimax_*.pkl
 legacy_app/db/ml.db
+
+# MLflow
+mlflow.db
+mlruns/
+
+# OS files
+.DS_Store
